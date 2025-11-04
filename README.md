@@ -3,7 +3,7 @@
 這個專案示範如何以 TF-IDF 特徵工程搭配 **線性 SVM** 與 **邏輯斯迴歸** 兩種模型建置垃圾簡訊分類器，並透過 Streamlit 提供互動式展示。
 
 - 📦 GitHub Repo（目前專案）
-- 🌐 Streamlit Demo：<https://2025spamemail.streamlit.app/>
+- 🌐 Streamlit Demo：<https://iot-hw3-fwtvcqvyp7rayp8u49brbs.streamlit.app/>
 
 > Demo 網址請在部署完成後更新為自己的 Streamlit App 連結。
 
