@@ -8,7 +8,8 @@ import joblib
 import pandas as pd
 import streamlit as st
 
-from src.data_utils import RAW_DATA_PATH, load_dataset
+from src.data_utils import RAW_DATA_PATH, download_dataset, load_dataset
+from src.train import save_artifacts, save_reports, train_and_evaluate
 
 
 ARTIFACT_DIR = Path("artifacts")
@@ -24,6 +25,10 @@ SAMPLE_MESSAGES = {
     "惡意連結": "Claim urgent refund at http://scam.link within 1 hour to avoid penalty.",
     "日常聊天": "Hey, are we still meeting for coffee this afternoon?",
 }
+REQUIRED_ARTIFACTS = [
+    ARTIFACT_DIR / "linear_svm_pipeline.joblib",
+    ARTIFACT_DIR / "logistic_regression_pipeline.joblib",
+]
 
 
 @st.cache_resource
@@ -225,9 +230,24 @@ def render_project_tab() -> None:
     st.info("提示：若首次啟動，請先執行訓練腳本以產生模型與報告。")
 
 
+def ensure_resources() -> None:
+    if REPORTS_PATH.exists() and all(path.exists() for path in REQUIRED_ARTIFACTS):
+        return
+
+    with st.spinner("首次啟動，正在下載資料並訓練模型..."):
+        download_dataset()
+        summary = train_and_evaluate()
+        save_artifacts(summary.results)
+        save_reports(summary.results, train_size=summary.train_size, test_size=summary.test_size)
+        load_metrics.clear()
+        load_sample_data.clear()
+        load_dataset_overview.clear()
+
+
 def main() -> None:
     st.set_page_config(page_title="垃圾郵件分類控制台", page_icon="📬", layout="wide")
 
+    ensure_resources()
     metrics = load_metrics()
     metadata = metrics.get("metadata", {})
     render_hero(metadata)
